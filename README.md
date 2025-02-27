@@ -28,25 +28,11 @@ bun install
 
 **Build the project**
 
-For continuous building as you work:
-
-```
-bun run dev
-```
-
 For final builds:
 
 ```
 bun run build
 ```
-
-**Format the source code**
-
-```
-bun run format
-```
-
-My build tools use the Biome (https://biomejs.dev/) toolchain for formatting and linting most source files; as well as Prettier (https://prettier.io/) for formatting html and markdown files. Formatting has always been a massive pain point in web dev, and will probably continue to be so. From time to time, I find better tools for formatting files; and the build tools may be updated accordingly.
 
 ## Project Structure
 
@@ -56,14 +42,14 @@ This folder contains _all_ of the files that are needed to build the website.
 
 `*.html`
 
-- During builds, `*.html` files are processed to replace tags that look like custom elements from Web Components api by replacing them with the contents of files from `./src/components/` that have the same name. You can still use custom elements and Web Components; just don't reuse the same names.
+- During builds, `*.html` files are processed to replace tags that look like custom elements from Web Components api by replacing them with the contents of files from `./src/lib/components/` that have the same name. You can still use custom elements and Web Components; just don't reuse the same names.
 
 `./src/lib/`
 
 - This folder exclusively contains TypeScript libraries and modules. This folder is ignored during the copy stage of the build process, so don't bother adding anything other than `*.ts` files here.
-- You could modify the build script `./tools/scripts/build.ts` to also handle `*.js` if you want, but there really isn't a reason to do so unless you want to make use of JavaScript libraries.
+- You could modify the build script `./tools/build.ts` to also handle `*.js` if you want, but there really isn't a reason to do so unless you want to make use of JavaScript libraries.
 
-### ./build/
+### ./out/
 
 This folder is produced during the build process and contains the final compiled source code.
 
@@ -95,7 +81,7 @@ A local database for database testing. I've prepared a standard PostgreSQL docke
 
 ### ./dev_server/
 
-A local web server for testing the website. It is configured to serve files from the `./build/` folder and works like a typical web server.
+A local web server for testing the website. It is configured to serve files from the `./out/` folder and works like a typical web server.
 
 Generally, you would use the VSCode **Live Server** extension during development process, as it is able to refresh pages automatically. I haven't created a feature like this for the local server, and I'm not sure I will, since Live Server exists and works well for that use case.
 
@@ -104,17 +90,6 @@ Generally, you would use the VSCode **Live Server** extension during development
 - yandeu.five-server
   - https://marketplace.visualstudio.com/items?itemName=yandeu.five-server
   - I don't recommend using this similar extension. It is not a drop-in replacement for Live Server. To use it efficiently, you would need to write a configuration file for each project (as far as I can see).
-
-### ./
-
-I've modified these files to work well with website projects. Please read over them to familiarize yourself with the configurations.
-
-- .gitignore
-- .prettierignore
-- .prettierrc
-- biome.json
-- package.json
-- tsconfig.json
 
 ## Copyright & License
 
