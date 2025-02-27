@@ -11,6 +11,7 @@ pnpm-lock.yaml
 yarn.lock
 
 # miscellaneous
+out
 src/lib/ericchase
 
 **/*.js

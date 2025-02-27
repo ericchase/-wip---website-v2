@@ -1,16 +1,23 @@
+// @bun
+// src/dev_server/server-data.ts
+var server_hostname = "127.0.0.1";
+var server_port = "8000";
+var server_http = `http://${server_hostname}:${server_port}`;
+var server_ws = `ws://${server_hostname}:${server_port}`;
+
 // src/lib/database-drivers/dbdriver-localhost.ts
 function getLocalhost(address) {
   return {
     async query(text, params) {
       const response = await fetch(`${address}/database/query`, {
-        method: 'POST',
-        body: JSON.stringify({ text, params }),
+        method: "POST",
+        body: JSON.stringify({ text, params })
       });
       if (response.status < 200 || response.status > 299) {
         throw await response.json();
       }
       return await response.json();
-    },
+    }
   };
 }
 
@@ -27,11 +34,7 @@ class UpdateMarker {
 }
 
 class UpdateMarkerManager {
-  $marks = new Set();
-  extra;
-  constructor(extra) {
-    this.extra = extra;
-  }
+  $marks = new Set;
   getNewMarker() {
     const marker = new UpdateMarker(this);
     this.$marks.add(marker);
@@ -49,23 +52,48 @@ class UpdateMarkerManager {
   }
 }
 
+class DataSetMarker {
+  $manager;
+  dataset = new Set;
+  constructor($manager) {
+    this.$manager = $manager;
+  }
+  reset() {
+    this.$manager.resetMarker(this);
+  }
+}
+
+class DataSetMarkerManager {
+  $marks = new Set;
+  getNewMarker() {
+    const marker = new DataSetMarker(this);
+    this.$marks.add(marker);
+    return marker;
+  }
+  resetMarker(mark) {
+    mark.dataset.clear();
+    this.$marks.add(mark);
+  }
+  updateMarkers(data) {
+    for (const mark of this.$marks) {
+      mark.dataset.add(data);
+    }
+  }
+}
+
 // src/lib/ericchase/Utility/Console.ts
+var marker_manager = new UpdateMarkerManager;
+var newline_count = 0;
 function ConsoleError(...items) {
-  console['error'](...items);
-  marker_manager.extra.newline_count = 0;
+  console["error"](...items);
+  newline_count = 0;
   marker_manager.updateMarkers();
 }
-var marker_manager = new UpdateMarkerManager({ newline_count: 0 });
-
-// src/dev_server/server-data.ts
-var server_hostname = '127.0.0.1';
-var server_port = '8000';
-var server_http = `http://${server_hostname}:${server_port}`;
-var server_ws = `ws://${server_hostname}:${server_port}`;
 
 // src/database/queries.module.ts
+var db = getLocalhost(server_http);
 async function DatabaseConnected() {
-  const q = 'SELECT 1';
+  const q = "SELECT 1";
   await db.query(q, []);
   return true;
 }
@@ -85,7 +113,7 @@ async function TableExists(name) {
       SELECT 1 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
-      AND table_name = \$1
+      AND table_name = $1
     );
   `;
   const { exists } = (await db.query(q, [name]))[0];
@@ -93,11 +121,11 @@ async function TableExists(name) {
 }
 async function EnsureTableExists(name) {
   try {
-    if ((await TableExists(name)) === true) {
+    if (await TableExists(name) === true) {
       return { created: false, exists: true };
     }
     await CreateTable(name);
-    if ((await TableExists(name)) === true) {
+    if (await TableExists(name) === true) {
       return { created: true, exists: true };
     }
   } catch (error) {
@@ -105,8 +133,9 @@ async function EnsureTableExists(name) {
   }
   return { created: false, exists: false };
 }
-var db = getLocalhost(server_http);
-export { TableExists, EnsureTableExists, DatabaseConnected, CreateTable };
-
-//# debugId=EF62B4312919262C64756E2164756E21
-//# sourceMappingURL=queries.module.js.map
+export {
+  TableExists,
+  EnsureTableExists,
+  DatabaseConnected,
+  CreateTable
+};

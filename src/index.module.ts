@@ -29,6 +29,8 @@ const page = new Page();
 
 page.addMessage('Hello, Script!');
 
+// Database requires docker to be installed and running.
+
 // try {
 //   if (await DatabaseConnected()) {
 //     const tableName = 'test';
